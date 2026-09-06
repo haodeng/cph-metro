@@ -1,0 +1,65 @@
+# Copenhagen M1 3D Ride
+
+An interactive 3D journey along Copenhagen Metro M1, from Vanløse to Vestamager. It combines a crisp OpenStreetMap basemap with MapLibre building extrusions, a mapped M1 alignment, 3D metro infrastructure, landmark labels, and a simulated train ride.
+
+## Run locally
+
+```bash
+npm install
+npm run dev -- --host 127.0.0.1
+```
+
+Build the production bundle with:
+
+```bash
+npm run build
+```
+
+## Controls
+
+| Control | Result |
+| --- | --- |
+| Right arrow / Forward | Move towards Vestamager |
+| Left arrow / Back | Move towards Vanløse |
+| Auto ride | Continues in the most recent travel direction |
+| Follow train | Recentres the camera on M1 |
+| Station or map label | Jumps to that station or landmark |
+| 3D metro | Shows or hides the illustrated metro structures |
+
+Manual movement pauses Auto ride. At either terminus, Auto ride travels back along the line without teleporting. The ride is a 6× playback simulation with smooth acceleration, braking, and brief stops; it is not live metro service or an official timetable.
+
+## Data and realism
+
+The M1 train follows the OpenStreetMap M1 relation rather than straight lines between station points. Building footprints, heights, and available colours come from OpenFreeMap/OpenMapTiles and OpenStreetMap.
+
+Landmarks include Det Kongelige Teater, Rosenborg Slot, Vor Frelsers Kirke, Christiansborg Slot, Rundetårn, and Frederiksberg Slot. Rosenborg and Rundetårn use a generic CC0 brick material to add facade detail. Their geometry, dimensions, roofs, and textures are simplified map visualisations, not surveyed or photo-accurate 3D models.
+
+The track alignment is mapped; the visible track height and station structures are illustrative. Dashed line sections identify underground M1 where the train indicator is deliberately shown at the surface.
+
+## Project structure
+
+| Path | Purpose |
+| --- | --- |
+| `src/main.js` | Map setup, controls, camera following, and layers |
+| `src/route.js` | M1 alignment, interpolation, and 3D metro structures |
+| `src/ride.js` | Bidirectional Auto ride simulation |
+| `src/landmarks.js` | Landmark labels and brick material selection |
+| `src/data/m1.json` | Bundled OpenStreetMap M1 geometry |
+| `src/data/landmarks.json` | Bundled landmark footprints and sources |
+| `public/textures/` | Landmark material assets and attribution |
+
+## Verification
+
+```bash
+node scripts/check-route.mjs
+node scripts/check-landmarks.mjs
+node scripts/check-ride.mjs
+npm run build
+```
+
+## Credits
+
+- Map rendering: [MapLibre GL JS](https://maplibre.org/)
+- Basemap, M1 alignment, landmark footprints, and labels: [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/)
+- Building vector data: [OpenFreeMap](https://openfreemap.org/) and [OpenMapTiles](https://www.openmaptiles.org/)
+- Brick material: [Poly Haven Brick Wall 001](https://polyhaven.com/a/brick_wall_001), [CC0](https://polyhaven.com/license)

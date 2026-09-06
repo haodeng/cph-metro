@@ -1,0 +1,11 @@
+AGENTS.md
+
+# Dependencies and generated Vite output
+node_modules/
+dist/
+
+# Local machine and environment files
+.DS_Store
+.env
+.env.*
+!.env.example

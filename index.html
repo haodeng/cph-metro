@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#06141e" />
+    <title>M1 / Copenhagen</title>
+  </head>
+  <body>
+    <main id="app">
+      <div id="map" aria-label="Interactive 3D map of Copenhagen Metro line M1"></div>
+      <div class="atmosphere" aria-hidden="true"></div>
+      <header class="brand"><span>M1</span><i></i> COPENHAGEN</header>
+      <aside class="map-key" aria-label="Map display">
+        <button id="structure-toggle" type="button" aria-pressed="true">3D metro</button>
+        <p id="map-status" role="status">Loading 3D buildings…</p>
+        <p>Mapped alignment · schematic structures</p>
+        <p>Dashed: tunnels shown at surface<br>Track heights & station sizes illustrative</p>
+        <label class="landmark-label" for="landmark-select">Explore a landmark</label>
+        <select id="landmark-select"><option value="">Choose a building</option></select>
+        <p id="landmark-note">Rosenborg & Rundetårn: generic brick textures.<br>Simplified buildings, not exact facades.</p>
+      </aside>
+      <section class="station-copy">
+        <p class="eyebrow">NOW ARRIVING</p>
+        <h1 id="station-name" aria-live="polite">Vanløse</h1>
+        <p id="station-detail">The western gateway — where the green line begins.</p>
+        <p id="ride-status">Paused · surface track</p>
+      </section>
+      <aside class="route-panel" aria-label="M1 stations">
+        <p class="route-heading">M1 · 15 STATIONS</p>
+        <ol id="station-list"></ol>
+        <p class="route-end">VESTAMAGER</p>
+      </aside>
+      <section class="controls">
+        <button class="key" type="button" data-step="-1" aria-label="Move backward"><kbd>←</kbd><span>BACK</span></button>
+        <button class="key" type="button" data-step="1" aria-label="Move forward"><kbd>→</kbd><span>FORWARD</span></button>
+        <button id="follow-toggle" type="button" aria-pressed="true">Following train</button>
+        <button id="tour-toggle" type="button" aria-pressed="false">Auto ride</button>
+      </section>
+      <footer class="progress-wrap">
+        <div class="progress-label"><span>VANLØSE</span><span id="distance">0.0 / 13.9 KM</span><span>VESTAMAGER</span></div>
+        <input id="progress" type="range" min="0" max="1400" value="0" aria-label="Journey position along M1" />
+      </footer>
+      <p class="attribution">Simulated ride · 6× playback · brief station stops</p>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
