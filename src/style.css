@@ -22,12 +22,12 @@ button, input { font: inherit; }
 h1 { margin: 0; font-size: clamp(36px, 4.2vw, 60px); letter-spacing: -.04em; line-height: 1.05; font-weight: 600; overflow-wrap: anywhere; }
 #station-detail { margin: 14px 0 0; max-width: 330px; font-size: 14px; line-height: 1.5; color: #d2ded8; }
 #ride-status { margin: 12px 0 0; font-size: 11px; line-height: 1.5; color: #a7ff80; font-variant-numeric: tabular-nums; }
-.route-panel { position: absolute; z-index: 2; right: clamp(25px, 4vw, 64px); top: 70px; width: 250px; padding: 20px; background: #06141e; max-height: calc(100vh - 180px); overflow-y: auto; scrollbar-color: #9bb6af #06141e; }
+.route-panel { position: absolute; z-index: 2; right: max(16px, 4vw); top: 70px; width: min(250px, calc(100vw - 32px)); padding: 20px; background: #06141e; max-height: calc(100vh - 180px); overflow-x: hidden; overflow-y: auto; scrollbar-color: #9bb6af #06141e; }
 .route-heading { margin: 0 0 18px 19px; color: #b8ccc4; }
 ol { list-style: none; margin: 0; padding: 0; position: relative; }
 ol::before { content: ''; position: absolute; top: 12px; bottom: 12px; left: 6px; width: 1px; background: rgba(221,245,229,.36); }
 li { position: relative; }
-li button { border: 0; color: #f0f6ed; background: transparent; padding: 5px 0; cursor: pointer; font-size: 14px; text-align: left; transition: color .2s, transform .2s; }
+li button { border: 0; color: #f0f6ed; background: transparent; max-width: 100%; padding: 5px 0; cursor: pointer; font-size: 14px; overflow-wrap: anywhere; text-align: left; transition: color .2s, transform .2s; }
 li button:hover { color: #fff; transform: translateX(3px); }
 .station-dot { position: relative; z-index: 1; display: inline-block; width: 13px; height: 13px; border: 2px solid #c8d9d3; background: #0c2430; border-radius: 50%; margin: 0 12px -2px 0; }
 li.active button { color: #a6ff7c; font-weight: 700; transform: translateX(4px); }
@@ -49,7 +49,7 @@ kbd { font: 500 22px/1 Manrope, sans-serif; color: #a7ff7c; }
 .map-key p { font-size: 11px; line-height: 1.5; margin: 7px 0; text-shadow: 0 1px 4px #06141e; }
 #structure-toggle { padding: 8px 12px; background: #102c2a; color: #ecf5ef; border: 1px solid #a6cebd; cursor: pointer; }
 #structure-toggle[aria-pressed="true"] { color: #a7ff7c; border-color: #a7ff7c; }
-.landmark-label { display: block; margin: 14px 0 6px; font-size: 12px; }
+.landmark-label { display: block; margin: 0 0 6px; font-size: 12px; }
 #landmark-select { display: block; width: 100%; max-width: 290px; padding: 8px; border: 1px solid #9bb6af; background: #102c2a; color: #f0f6ed; font: inherit; font-size: 12px; }
 #landmark-select:focus-visible { outline: 2px solid #a7ff7c; outline-offset: 3px; }
 button:focus-visible { outline: 2px solid #a7ff7c; outline-offset: 4px; }

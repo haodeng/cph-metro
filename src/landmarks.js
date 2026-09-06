@@ -10,12 +10,18 @@ export const places = landmarks.features.map(feature => {
   return { ...feature.properties, center: [(west + east) / 2, (south + north) / 2], bounds: [west - dx, south - dy, east + dx, north + dy] }
 })
 
-// This marker is placed only at the verified DR Byen OSM way 25520993, rather
-// than adding invented logos on unrelated landmarks.
+// These markers are placed only at verified OSM features: DR Byen is way
+// 25520993, Field's is relation 20346870, Royal Arena is way 391594117, and
+// Christiania is marked at its mapped centre (12.60216, 55.67396).
+// They are never used as invented logos on unrelated landmarks.
 const brandSites = [
   { name: 'DR Byen', coordinates: [12.590550467567567, 55.65797834594595], image: 'dr-logo', size: .14 },
+  { name: "Field's", coordinates: [12.5775131, 55.6303752], image: 'fields-logo', size: .13 },
+  { name: 'Royal Arena', coordinates: [12.5736542, 55.6254153], image: 'royal-arena-logo', size: .25 },
+  { name: 'Christiania', coordinates: [12.60216, 55.67396], image: 'christiania-logo', size: .44 },
 ]
 const fieldsFootprint = { bounds: [12.57555, 55.62931, 12.57960, 55.63129] }
+const royalArenaFootprint = { bounds: [12.57273, 55.62446, 12.57457, 55.62622] }
 
 export function containsBuilding(place, feature) {
   const { type, coordinates } = feature.geometry
@@ -80,7 +86,6 @@ export async function addLandmarks(map) {
     updateMaterials()
   } catch (error) {
     // Keep the original buildings and labels usable if the local image fails.
-    document.querySelector('#landmark-note').textContent = 'Landmark names available. Brick texture could not load; reload to retry.'
     console.warn('Landmark texture unavailable', error)
   }
 }
@@ -91,8 +96,16 @@ export async function addBrandSites(map) {
   })) }
   map.addSource('brand-sites', { type: 'geojson', data })
   try {
-    const drLogo = await map.loadImage(`${import.meta.env.BASE_URL}textures/dr-logo.png`)
+    const [drLogo, fieldsLogo, royalArenaLogo, christianiaLogo] = await Promise.all([
+      map.loadImage(`${import.meta.env.BASE_URL}textures/dr-logo.png`),
+      map.loadImage(`${import.meta.env.BASE_URL}textures/fields-logo.png`),
+      map.loadImage(`${import.meta.env.BASE_URL}textures/royal-arena-logo.png`),
+      map.loadImage(`${import.meta.env.BASE_URL}textures/christiania-logo.jpg`),
+    ])
     map.addImage('dr-logo', drLogo.data)
+    map.addImage('fields-logo', fieldsLogo.data)
+    map.addImage('royal-arena-logo', royalArenaLogo.data)
+    map.addImage('christiania-logo', christianiaLogo.data)
     // The Field's building remains the OSM/OpenMapTiles extrusion. This tint
     // gives its broad glazed facade a clearer material cue without changing
     // its footprint, height, or roof geometry.
@@ -125,12 +138,40 @@ export async function addBrandSites(map) {
     map.on('sourcedata', event => { if (event.sourceId === 'openmaptiles' && event.isSourceLoaded) updateFieldsFacade() })
     map.on('idle', updateFieldsFacade)
     updateFieldsFacade()
+    // Royal Arena's documented gold terracotta fins and glass base are
+    // represented as material cues over its mapped building, not custom mesh.
+    const arenaBuilding = { source: 'openmaptiles', 'source-layer': 'building', minzoom: 14,
+      filter: ['in', ['id'], ['literal', []]],
+    }
+    const arenaHeight = ['coalesce', ['get', 'render_height'], ['get', 'height'], 7]
+    map.addLayer({ ...arenaBuilding, id: 'royal-arena-facade', type: 'fill-extrusion', paint: {
+      'fill-extrusion-color': '#b68c57', 'fill-extrusion-height': arenaHeight,
+      'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], ['get', 'min_height'], 0],
+      'fill-extrusion-vertical-gradient': true,
+    } })
+    map.addLayer({ ...arenaBuilding, id: 'royal-arena-roof', type: 'fill-extrusion', paint: {
+      'fill-extrusion-color': '#647d86', 'fill-extrusion-height': arenaHeight, 'fill-extrusion-base': arenaHeight,
+    } })
+    const arenaIds = new Set()
+    const updateArenaFacade = () => {
+      let changed = false
+      for (const feature of map.querySourceFeatures('openmaptiles', { sourceLayer: 'building' })) {
+        if (feature.id == null || feature.properties.hide_3d || !containsBuilding(royalArenaFootprint, feature)) continue
+        if (!arenaIds.has(feature.id)) { arenaIds.add(feature.id); changed = true }
+      }
+      if (!changed) return
+      const filter = ['all', ['!=', ['get', 'hide_3d'], true], ['in', ['id'], ['literal', [...arenaIds]]]]
+      map.setFilter('royal-arena-facade', filter)
+      map.setFilter('royal-arena-roof', filter)
+    }
+    map.on('sourcedata', event => { if (event.sourceId === 'openmaptiles' && event.isSourceLoaded) updateArenaFacade() })
+    map.on('idle', updateArenaFacade)
+    updateArenaFacade()
     map.addLayer({ id: 'brand-site-logo', type: 'symbol', source: 'brand-sites', minzoom: 15,
       layout: { 'icon-image': ['get', 'image'], 'icon-size': ['get', 'size'], 'icon-allow-overlap': true, 'icon-anchor': 'bottom', 'text-field': ['get', 'name'], 'text-font': ['Noto Sans Bold'], 'text-size': 13, 'text-offset': [0, 1.2], 'text-anchor': 'top', 'text-allow-overlap': true },
       paint: { 'text-color': '#fff0c9', 'text-halo-color': '#06141e', 'text-halo-width': 2.5 },
     })
   } catch (error) {
-    document.querySelector('#landmark-note').textContent = 'Landmark names available. Site logos could not load; reload to retry.'
     console.warn('Site logo unavailable', error)
   }
 }

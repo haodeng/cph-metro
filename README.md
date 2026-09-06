@@ -36,9 +36,15 @@ Landmarks include Det Kongelige Teater, Rosenborg Slot, Vor Frelsers Kirke, Chri
 
 DR Byen carries the verified DR wordmark at its mapped building location. It is used as an identifier for the place, not as a general decoration or endorsement.
 
-Field's beside Ørestad uses a glass-and-metal facade tint on its mapped extrusion. Its footprint, height, and roof geometry remain map data; this is not a bespoke 3D reconstruction.
+Field's beside Ørestad uses a glass-and-metal facade tint and its current official site mark on the mapped extrusion. Its footprint, height, and roof geometry remain map data; this is not a bespoke 3D reconstruction.
+
+Royal Arena between Ørestad and Vestamager uses the supplied logo and a warm terracotta façade cue based on the venue's documented vertical fins. Its footprint, height, and roof geometry remain map data; this is not a bespoke 3D reconstruction.
+
+Christiania is marked near Christianshavn with the supplied logo. Its canopy accents and warm community lights are illustrative, map-anchored details rather than a survey of activity in the area.
 
 The track alignment is mapped; the visible track height and station structures are illustrative. Dashed line sections identify underground M1 where the train indicator is deliberately shown at the surface.
+
+Five illustrative cattle markers are placed in the grass near Sundby. They are decorative map details and do not represent real livestock locations.
 
 ## Project structure
 
@@ -48,6 +54,8 @@ The track alignment is mapped; the visible track height and station structures a
 | `src/route.js` | M1 alignment, interpolation, and 3D metro structures |
 | `src/ride.js` | Bidirectional Auto ride simulation |
 | `src/landmarks.js` | Landmark labels and brick material selection |
+| `src/cattle.js` | Illustrative, map-anchored cattle near Sundby |
+| `src/christiania.js` | Illustrative community lights and canopy accents near Christiania |
 | `src/data/m1.json` | Bundled OpenStreetMap M1 geometry |
 | `src/data/landmarks.json` | Bundled landmark footprints and sources |
 | `public/textures/` | Landmark material assets and attribution |
@@ -68,3 +76,5 @@ npm run build
 - Building vector data: [OpenFreeMap](https://openfreemap.org/) and [OpenMapTiles](https://www.openmaptiles.org/)
 - Brick material: [Poly Haven Brick Wall 001](https://polyhaven.com/a/brick_wall_001), [CC0](https://polyhaven.com/license)
 - DR wordmark: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Danmarks_Radio_logo.svg); DR is its trademark owner
+- Field's site mark: [Field's official website](https://fields.steenstrom.dk/); Field's is its trademark owner
+- Royal Arena façade reference: [Danish Architecture Center](https://dac.dk/en/magazine/places/royal-arena-285); logo supplied by the user

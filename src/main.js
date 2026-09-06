@@ -4,6 +4,8 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import './style.css'
 import { routeStops, routePosition, totalDistance, infrastructure, platforms, tunnels } from './route.js'
 import { addBrandSites, addLandmarks, places } from './landmarks.js'
+import { addSundbyCattle } from './cattle.js'
+import { addChristianiaLife } from './christiania.js'
 import { createRide, advanceRide, playbackRate } from './ride.js'
 
 // MapLibre 6 ships a separate worker. Give Vite its URL so vector and GeoJSON
@@ -12,7 +14,7 @@ maplibregl.setWorkerUrl(mapWorkerUrl)
 
 // Station stories; mapped stop positions and journey distances come from OSM below.
 const stations = [
-  ['Vanløse', 'The western gateway — where the green line begins.'], ['Flintholm', 'A high interchange above the city.'], ['Lindevang', 'Quiet streets, tree crowns, and low rooftops.'], ['Fasanvej', 'The line folds into Frederiksberg.'], ['Frederiksberg', 'A wide square at the heart of the borough.'], ['Forum', 'Beneath the old Forum arena.'], ['Nørreport', 'Copenhagen’s busiest interchange.'], ['Kongens Nytorv', 'The royal square, Nyhavn, and the harbour.'], ['Christianshavn', 'Canals and centuries of brick facades.'], ['Islands Brygge', 'The harbour opens out to the south.'], ['DR Byen', 'Broadcast city meets the university campus.'], ['Sundby', 'A neighbourhood pause before Ørestad.'], ['Bella Center', 'Big skies and exhibition halls.'], ['Ørestad', 'Glass towers rise beside the elevated line.'], ['Vestamager', 'The city dissolves into the wide Amager landscape.'],
+  ['Vanløse', 'The western gateway — where the green line begins.'], ['Flintholm', 'A high interchange above the city.'], ['Lindevang', 'Quiet streets, tree crowns, and low rooftops.'], ['Fasanvej', 'The line folds into Frederiksberg.'], ['Frederiksberg', 'A wide square at the heart of the borough.'], ['Forum', 'Beneath the old Forum arena.'], ['Nørreport', 'Copenhagen’s busiest interchange.'], ['Kongens Nytorv', 'The royal square, Nyhavn, and the harbour.'], ['Christianshavn', 'Canals, brick facades, and Christiania nearby.'], ['Islands Brygge', 'The harbour opens out to the south.'], ['DR Byen', 'Broadcast city meets the university campus.'], ['Sundby', 'A neighbourhood pause before Ørestad.'], ['Bella Center', 'Big skies and exhibition halls.'], ['Ørestad', 'Glass towers rise beside the elevated line.'], ['Vestamager', 'The city dissolves into the wide Amager landscape.'],
 ]
 stations.forEach((station, index) => { station[2] = routeStops[index].progress; station[3] = routeStops[index].coordinates })
 const stopDistances = routeStops.map(stop => stop.progress * totalDistance)
@@ -80,16 +82,9 @@ function addM1Layers() {
   addInfrastructure()
   addLandmarks(map)
   addBrandSites(map)
+  addSundbyCattle(map)
+  addChristianiaLife(map)
   mapReady = true
-  const updateMapStatus = () => {
-    document.querySelector('#map-status').textContent = map.querySourceFeatures('openmaptiles', { sourceLayer: 'building' }).length
-      ? '3D buildings · mapped heights where available' : 'No 3D buildings in this view · zoom in to explore'
-  }
-  map.on('idle', updateMapStatus)
-  map.on('sourcedata', event => { if (event.sourceId === 'openmaptiles' && event.isSourceLoaded) updateMapStatus() })
-  map.on('error', event => {
-    if (event.sourceId === 'openmaptiles') document.querySelector('#map-status').textContent = 'Building tiles unavailable · reload to retry'
-  })
   followTrain(true)
 }
 if (map.isStyleLoaded()) addM1Layers()
@@ -170,14 +165,6 @@ function addInfrastructure() {
     new maplibregl.Marker({ element: button, anchor: 'bottom', offset: [0, -24] }).setLngLat(stop.coordinates).addTo(map)
   })
 }
-const structureToggle = document.querySelector('#structure-toggle')
-structureToggle.addEventListener('click', () => {
-  if (!mapReady) return
-  const visible = structureToggle.getAttribute('aria-pressed') !== 'true'
-  structureToggle.setAttribute('aria-pressed', String(visible))
-  for (const id of ['metro-structure', 'metro-stations', 'metro-tunnels']) map.setLayoutProperty(id, 'visibility', visible ? 'visible' : 'none')
-  document.querySelectorAll('.map-station').forEach(marker => { marker.hidden = !visible })
-})
 document.querySelectorAll('[data-step]').forEach(button => button.addEventListener('click', () => {
   stopAutoRide()
   travelDirection = Number(button.dataset.step)
@@ -189,7 +176,11 @@ document.querySelectorAll('[data-step]').forEach(button => button.addEventListen
 window.addEventListener('blur', () => { heldDirection = 0 })
 
 const landmarkSelect = document.querySelector('#landmark-select')
-places.forEach((place, index) => {
+const explorePlaces = [...places, {
+  name: 'Christiania', center: [12.60216, 55.67396], zoom: 16.5,
+  description: 'Community lights and canopy accents are illustrative. Use Follow train to return to the metro.',
+}]
+explorePlaces.forEach((place, index) => {
   const option = document.createElement('option')
   option.value = String(index)
   option.textContent = place.name
@@ -197,15 +188,15 @@ places.forEach((place, index) => {
 })
 landmarkSelect.addEventListener('change', () => {
   if (!mapReady || landmarkSelect.value === '') return
-  const place = places[Number(landmarkSelect.value)]
+  const place = explorePlaces[Number(landmarkSelect.value)]
   stopAutoRide()
   heldDirection = 0
   following = false
   followToggle.textContent = 'Follow train'
   followToggle.setAttribute('aria-pressed', 'false')
   stationName.textContent = place.name
-  stationDetail.textContent = 'Mapped building model. Use Follow train to return to the metro.'
+  stationDetail.textContent = place.description || 'Mapped building model. Use Follow train to return to the metro.'
   document.querySelector('.eyebrow').textContent = 'LANDMARK VIEW'
   document.querySelector('#ride-status').textContent = 'Ride paused'
-  map.flyTo({ center: place.center, zoom: 18, pitch: 64, bearing: -25, duration: 1300 })
+  map.flyTo({ center: place.center, zoom: place.zoom || 18, pitch: 64, bearing: -25, duration: 1300 })
 })
