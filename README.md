@@ -23,8 +23,8 @@ npm run build
 | Left arrow / Back | Move towards Vanløse |
 | Auto ride | Continues in the most recent travel direction |
 | Follow train | Recentres the camera on M1 |
-| Station or map label | Jumps to that station or landmark |
-| 3D metro | Shows or hides the illustrated metro structures |
+| Station label | Jumps to that station |
+| Explore a landmark | Opens a landmark or Christiania view |
 
 Manual movement pauses Auto ride. At either terminus, Auto ride travels back along the line without teleporting. The ride is a 6× playback simulation with smooth acceleration, braking, and brief stops; it is not live metro service or an official timetable.
 
@@ -78,3 +78,22 @@ npm run build
 - DR wordmark: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Danmarks_Radio_logo.svg); DR is its trademark owner
 - Field's site mark: [Field's official website](https://fields.steenstrom.dk/); Field's is its trademark owner
 - Royal Arena façade reference: [Danish Architecture Center](https://dac.dk/en/magazine/places/royal-arena-285); logo supplied by the user
+
+## License and third-party material
+
+The source code in this repository is licensed under the [MIT License](LICENSE).
+
+The license does not replace the terms that apply to third-party map data, textures, logos, names, and trademarks. OpenStreetMap-derived data remains available under the [ODbL 1.0](https://opendatacommons.org/licenses/odbl/). The credited logo and trademark owners retain their rights. See [public/textures/README.md](public/textures/README.md) for asset-specific attribution.
+
+## Contributing
+
+Contributions are welcome. Please keep pull requests focused, preserve the mapped M1 alignment and third-party attributions, and avoid adding commercial map services or API keys.
+
+Before opening a pull request, run:
+
+```bash
+node scripts/check-route.mjs
+node scripts/check-landmarks.mjs
+node scripts/check-ride.mjs
+npm run build
+```
