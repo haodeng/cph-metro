@@ -11,3 +11,5 @@ Copenhagen landmarks. The map uses it for buildings tagged as brick in OSM.
 Building geometry and heights still come from OpenFreeMap/OpenMapTiles.
 The six landmark footprints and names in `src/data/landmarks.json` come from
 OpenStreetMap (ODbL 1.0); individual source URLs are recorded in that file.
+
+`dr-logo.svg` is the Danmarks Radio wordmark from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Danmarks_Radio_logo.svg). `dr-logo.png` is its local, renderer-compatible PNG conversion. It is used only at the mapped DR Byen location (OSM way 25520993). DR remains the trademark owner.

@@ -34,6 +34,10 @@ The M1 train follows the OpenStreetMap M1 relation rather than straight lines be
 
 Landmarks include Det Kongelige Teater, Rosenborg Slot, Vor Frelsers Kirke, Christiansborg Slot, Rundetårn, and Frederiksberg Slot. Rosenborg and Rundetårn use a generic CC0 brick material to add facade detail. Their geometry, dimensions, roofs, and textures are simplified map visualisations, not surveyed or photo-accurate 3D models.
 
+DR Byen carries the verified DR wordmark at its mapped building location. It is used as an identifier for the place, not as a general decoration or endorsement.
+
+Field's beside Ørestad uses a glass-and-metal facade tint on its mapped extrusion. Its footprint, height, and roof geometry remain map data; this is not a bespoke 3D reconstruction.
+
 The track alignment is mapped; the visible track height and station structures are illustrative. Dashed line sections identify underground M1 where the train indicator is deliberately shown at the surface.
 
 ## Project structure
@@ -63,3 +67,4 @@ npm run build
 - Basemap, M1 alignment, landmark footprints, and labels: [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/)
 - Building vector data: [OpenFreeMap](https://openfreemap.org/) and [OpenMapTiles](https://www.openmaptiles.org/)
 - Brick material: [Poly Haven Brick Wall 001](https://polyhaven.com/a/brick_wall_001), [CC0](https://polyhaven.com/license)
+- DR wordmark: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Danmarks_Radio_logo.svg); DR is its trademark owner

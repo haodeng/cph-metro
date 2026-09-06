@@ -10,6 +10,13 @@ export const places = landmarks.features.map(feature => {
   return { ...feature.properties, center: [(west + east) / 2, (south + north) / 2], bounds: [west - dx, south - dy, east + dx, north + dy] }
 })
 
+// This marker is placed only at the verified DR Byen OSM way 25520993, rather
+// than adding invented logos on unrelated landmarks.
+const brandSites = [
+  { name: 'DR Byen', coordinates: [12.590550467567567, 55.65797834594595], image: 'dr-logo', size: .14 },
+]
+const fieldsFootprint = { bounds: [12.57555, 55.62931, 12.57960, 55.63129] }
+
 export function containsBuilding(place, feature) {
   const { type, coordinates } = feature.geometry
   if (type !== 'Polygon' && type !== 'MultiPolygon') return false
@@ -75,5 +82,55 @@ export async function addLandmarks(map) {
     // Keep the original buildings and labels usable if the local image fails.
     document.querySelector('#landmark-note').textContent = 'Landmark names available. Brick texture could not load; reload to retry.'
     console.warn('Landmark texture unavailable', error)
+  }
+}
+
+export async function addBrandSites(map) {
+  const data = { type: 'FeatureCollection', features: brandSites.map(site => ({
+    type: 'Feature', properties: { name: site.name, image: site.image, size: site.size }, geometry: { type: 'Point', coordinates: site.coordinates },
+  })) }
+  map.addSource('brand-sites', { type: 'geojson', data })
+  try {
+    const drLogo = await map.loadImage(`${import.meta.env.BASE_URL}textures/dr-logo.png`)
+    map.addImage('dr-logo', drLogo.data)
+    // The Field's building remains the OSM/OpenMapTiles extrusion. This tint
+    // gives its broad glazed facade a clearer material cue without changing
+    // its footprint, height, or roof geometry.
+    const fieldsBuilding = { source: 'openmaptiles', 'source-layer': 'building', minzoom: 14,
+      filter: ['in', ['id'], ['literal', []]],
+    }
+    const fieldsHeight = ['coalesce', ['get', 'render_height'], ['get', 'height'], 7]
+    map.addLayer({ ...fieldsBuilding, id: 'fields-facade', type: 'fill-extrusion', paint: {
+      'fill-extrusion-color': '#405964', 'fill-extrusion-height': fieldsHeight,
+      'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], ['get', 'min_height'], 0],
+      'fill-extrusion-vertical-gradient': true,
+    } })
+    map.addLayer({ ...fieldsBuilding, id: 'fields-roof', type: 'fill-extrusion', paint: {
+      'fill-extrusion-color': '#9aa9a8', 'fill-extrusion-height': fieldsHeight, 'fill-extrusion-base': fieldsHeight,
+    } })
+    // Building parts in the vector tiles do not retain the mall's name. Select
+    // only the stable IDs fully inside its sourced OSM footprint as tiles load.
+    const fieldsIds = new Set()
+    const updateFieldsFacade = () => {
+      let changed = false
+      for (const feature of map.querySourceFeatures('openmaptiles', { sourceLayer: 'building' })) {
+        if (feature.id == null || feature.properties.hide_3d || !containsBuilding(fieldsFootprint, feature)) continue
+        if (!fieldsIds.has(feature.id)) { fieldsIds.add(feature.id); changed = true }
+      }
+      if (!changed) return
+      const filter = ['all', ['!=', ['get', 'hide_3d'], true], ['in', ['id'], ['literal', [...fieldsIds]]]]
+      map.setFilter('fields-facade', filter)
+      map.setFilter('fields-roof', filter)
+    }
+    map.on('sourcedata', event => { if (event.sourceId === 'openmaptiles' && event.isSourceLoaded) updateFieldsFacade() })
+    map.on('idle', updateFieldsFacade)
+    updateFieldsFacade()
+    map.addLayer({ id: 'brand-site-logo', type: 'symbol', source: 'brand-sites', minzoom: 15,
+      layout: { 'icon-image': ['get', 'image'], 'icon-size': ['get', 'size'], 'icon-allow-overlap': true, 'icon-anchor': 'bottom', 'text-field': ['get', 'name'], 'text-font': ['Noto Sans Bold'], 'text-size': 13, 'text-offset': [0, 1.2], 'text-anchor': 'top', 'text-allow-overlap': true },
+      paint: { 'text-color': '#fff0c9', 'text-halo-color': '#06141e', 'text-halo-width': 2.5 },
+    })
+  } catch (error) {
+    document.querySelector('#landmark-note').textContent = 'Landmark names available. Site logos could not load; reload to retry.'
+    console.warn('Site logo unavailable', error)
   }
 }

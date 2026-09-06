@@ -3,7 +3,7 @@ import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import './style.css'
 import { routeStops, routePosition, totalDistance, infrastructure, platforms, tunnels } from './route.js'
-import { addLandmarks, places } from './landmarks.js'
+import { addBrandSites, addLandmarks, places } from './landmarks.js'
 import { createRide, advanceRide, playbackRate } from './ride.js'
 
 // MapLibre 6 ships a separate worker. Give Vite its URL so vector and GeoJSON
@@ -79,6 +79,7 @@ function addM1Layers() {
   })
   addInfrastructure()
   addLandmarks(map)
+  addBrandSites(map)
   mapReady = true
   const updateMapStatus = () => {
     document.querySelector('#map-status').textContent = map.querySourceFeatures('openmaptiles', { sourceLayer: 'building' }).length
